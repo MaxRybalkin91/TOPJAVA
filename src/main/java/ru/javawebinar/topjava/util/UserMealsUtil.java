@@ -24,13 +24,8 @@ public class UserMealsUtil {
         List<UserMealWithExceed> filteredList = getFilteredWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         List<UserMealWithExceed> filteredStreamList = getFilteredStreamWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
 
-        for (UserMealWithExceed um : filteredList) {
-            System.out.println(um.printUser());
-        }
-
-        for (UserMealWithExceed um : filteredStreamList) {
-            System.out.println(um.printUser());
-        }
+        printUsers(filteredList);
+        printUsers(filteredStreamList);
     }
 
     public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -67,5 +62,11 @@ public class UserMealsUtil {
     private static UserMealWithExceed createUserMealWithExceed(Map<LocalDate, Integer> caloriesOfDayMap, UserMeal um, int caloriesPerDay) {
         boolean isExceeds = caloriesOfDayMap.get(um.getDateTime().toLocalDate()) >= caloriesPerDay;
         return new UserMealWithExceed(um.getDateTime(), um.getDescription(), um.getCalories(), isExceeds);
+    }
+
+    private static void printUsers(List<UserMealWithExceed> list) {
+        for (UserMealWithExceed um : list) {
+            System.out.println(um.printUser());
+        }
     }
 }
