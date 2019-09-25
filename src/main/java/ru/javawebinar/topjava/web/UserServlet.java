@@ -7,11 +7,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class UserServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    }
-
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        request.getRequestDispatcher("/users.jsp").forward(request, response);
     }
 }
