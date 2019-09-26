@@ -17,14 +17,7 @@ import static java.util.stream.Collectors.toList;
 
 public class MealsUtil {
     public static void main(String[] args) {
-        List<Meal> meals = Arrays.asList(
-                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500),
-                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000),
-                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500),
-                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000),
-                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500),
-                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510)
-        );
+        List<Meal> meals = fillListOfMeals();
         List<MealTo> mealsWithExcess = getFilteredWithExcess(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         mealsWithExcess.forEach(System.out::println);
 
@@ -84,7 +77,6 @@ public class MealsUtil {
                 }
             }
 
-            // never invoked if the upstream is sequential
             private Aggregate combine(Aggregate that) {
                 this.dailySumOfCalories += that.dailySumOfCalories;
                 this.dailyMeals.addAll(that.dailyMeals);
@@ -105,7 +97,22 @@ public class MealsUtil {
         return values.stream().flatMap(identity()).collect(toList());
     }
 
+    public static List<MealTo> getListForServlet() {
+        return getFilteredWithExcess(fillListOfMeals(), LocalTime.of(0, 0), LocalTime.of(23, 59), 3000);
+    }
+
     private static MealTo createWithExcess(Meal meal, boolean excess) {
         return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+    }
+
+    private static List<Meal> fillListOfMeals() {
+        return Arrays.asList(
+                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510)
+        );
     }
 }
