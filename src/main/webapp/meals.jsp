@@ -1,3 +1,4 @@
+<%@ page import="ru.javawebinar.topjava.model.MealTo" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -8,6 +9,19 @@
 </head>
 <body>
 <section>
+    <form method="get">
+        Дневная норма калорий
+        <input type="number" name="calories" size=10 value="${MealTo.getCaloriesPerDay()}">
+        <input type="hidden" name="action" value="setCalories">
+        <button type="submit">Сохранить</button>
+    </form>
+    <form method="get">
+        <input type="hidden" name="action" value="fill">
+        <button type="submit">Заполнить таблицу</button>
+    </form>
+    <form method="get">
+        <button name="action" type="submit" value="add">Создать запись</button>
+    </form>
     <table border="1" cellpadding="8" cellspacing="0">
         <tr>
             <th>Дата и время</th>
