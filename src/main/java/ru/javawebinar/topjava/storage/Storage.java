@@ -10,6 +10,8 @@ public interface Storage {
 
     public void delete(Integer id);
 
+    public void update(Integer id, Meal meal);
+
     public Meal get(Integer id);
 
     public Collection<Meal> getAll();

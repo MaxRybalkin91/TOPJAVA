@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.model;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class MealTo {
     private final Integer id;
@@ -12,8 +13,6 @@ public class MealTo {
     private final int calories;
 
     private final boolean excess;
-
-    private static int caloriesPerDay;
 
     public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
         this.id = id;
@@ -28,7 +27,7 @@ public class MealTo {
     }
 
     public String getStringDateTime() {
-        return dateTime.toString().replace('T', ' ');
+        return dateTime.truncatedTo(ChronoUnit.MINUTES).toString().replace('T', ' ');
     }
 
     public String getDescription() {
@@ -41,14 +40,6 @@ public class MealTo {
 
     public boolean isExcess() {
         return excess;
-    }
-
-    public static int getCaloriesPerDay() {
-        return caloriesPerDay;
-    }
-
-    public static void setCaloriesPerDay(int caloriesPerDay) {
-        MealTo.caloriesPerDay = caloriesPerDay;
     }
 
     @Override
