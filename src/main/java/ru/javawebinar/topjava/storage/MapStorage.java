@@ -17,19 +17,14 @@ public class MapStorage implements Storage {
 
     @Override
     public void save(Meal meal) {
-        int id = incrementId();
-        if (isEmptyId(meal)) {
-            meal.setId(id);
+        Integer mealId = meal.getId();
+        if (mealId == null) {
+            mealId = id.getAndIncrement();
+            meal.setId(mealId);
         }
-        mealMapStorage.put(id, meal);
+        mealMapStorage.put(mealId, meal);
     }
 
-    @Override
-    public void update(Integer id, Meal meal) {
-        mealMapStorage.replace(id, meal);
-    }
-
-    @Override
     public void delete(Integer id) {
         mealMapStorage.remove(id);
     }
@@ -45,26 +40,17 @@ public class MapStorage implements Storage {
     }
 
     public void fillMapStorage() {
-        mealMapStorage.clear();
         List<Meal> meals = Arrays.asList(
-                new Meal(incrementId(), LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500),
-                new Meal(incrementId(), LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000),
-                new Meal(incrementId(), LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500),
-                new Meal(incrementId(), LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000),
-                new Meal(incrementId(), LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500),
-                new Meal(incrementId(), LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510)
+                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500),
+                new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510)
         );
 
         for (Meal meal : meals) {
-            mealMapStorage.put(meal.getId(), meal);
+            save(meal);
         }
-    }
-
-    private int incrementId() {
-        return id.getAndIncrement();
-    }
-
-    private boolean isEmptyId(Meal meal) {
-        return meal.getId() == null;
     }
 }

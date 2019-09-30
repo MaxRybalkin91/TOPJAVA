@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.storage.MapStorage;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -20,28 +19,26 @@ public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private MapStorage storage = new MapStorage();
 
+    @Override
+    public void init() {
+        storage.fillMapStorage();
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding("UTF-8");
-        String userCalories = request.getParameter("dailyCalories");
-        if (!isEmpty(userCalories)) {
-            User.setCaloriesPerDay(Integer.parseInt(userCalories));
-            response.sendRedirect("meals");
-            return;
-        }
 
         String mealId = request.getParameter("id");
         boolean isMealIdEmpty = isEmpty(mealId);
         log.info(isMealIdEmpty ? "adding" : "editing");
 
-        Meal meal = new Meal();
-        meal.setDateTime(LocalDateTime.parse(request.getParameter("localDateTime")));
-        meal.setDescription(request.getParameter("description"));
-        meal.setCalories(Integer.parseInt(request.getParameter("calories")));
-        if (isMealIdEmpty) {
-            storage.save(meal);
-        } else {
-            storage.update(Integer.parseInt(mealId), meal);
+        LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("localDateTime"));
+        String description = request.getParameter("description");
+        int calories = Integer.parseInt(request.getParameter("calories"));
+        Meal meal = new Meal(dateTime, description, calories);
+        if (!isMealIdEmpty) {
+            meal.setId(Integer.parseInt(mealId));
         }
+        storage.save(meal);
         response.sendRedirect("meals");
     }
 
@@ -56,7 +53,8 @@ public class MealServlet extends HttpServlet {
                 case "delete":
                     log.info("deleting");
                     storage.delete(getId(request));
-                    break;
+                    response.sendRedirect("meals");
+                    return;
                 case "add":
                 case "edit":
                     log.info(action.equals("add") ? "adding" : "editing");
@@ -64,8 +62,7 @@ public class MealServlet extends HttpServlet {
                     request.setAttribute("meal", meal);
                     page = "edit.jsp";
                     break;
-                case "fill":
-                    storage.fillMapStorage();
+                default:
                     break;
             }
         }
@@ -73,15 +70,8 @@ public class MealServlet extends HttpServlet {
         request.getRequestDispatcher(page).forward(request, response);
     }
 
-    private boolean isEmpty(String... values) {
-        boolean isEmpty = false;
-        for (String value : values) {
-            if (value == null || value.trim().length() == 0) {
-                isEmpty = true;
-                break;
-            }
-        }
-        return isEmpty;
+    private boolean isEmpty(String value) {
+        return value == null || value.trim().length() == 0;
     }
 
     private int getId(HttpServletRequest request) {

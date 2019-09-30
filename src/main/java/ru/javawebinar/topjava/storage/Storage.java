@@ -6,13 +6,11 @@ import java.util.Collection;
 
 public interface Storage {
 
-    public void save(Meal meal);
+    void save(Meal meal);
 
-    public void delete(Integer id);
+    void delete(Integer id);
 
-    public void update(Integer id, Meal meal);
+    Meal get(Integer id);
 
-    public Meal get(Integer id);
-
-    public Collection<Meal> getAll();
+    Collection<Meal> getAll();
 }

@@ -8,7 +8,7 @@
     <form method="post" action="meals">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
-            <dt>Дата и вреия</dt>
+            <dt>Дата и время</dt>
             <dd><input type="datetime-local" name="localDateTime" size=25 value="${meal.dateTime}"></dd>
             <dt>Наименование блюда</dt>
             <dd><input type="text" name="description" size=50 value="${meal.description}"></dd>

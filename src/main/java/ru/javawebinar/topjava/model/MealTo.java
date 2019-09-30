@@ -1,7 +1,6 @@
 package ru.javawebinar.topjava.model;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 public class MealTo {
     private final Integer id;
@@ -26,8 +25,8 @@ public class MealTo {
         return id;
     }
 
-    public String getStringDateTime() {
-        return dateTime.truncatedTo(ChronoUnit.MINUTES).toString().replace('T', ' ');
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
     public String getDescription() {

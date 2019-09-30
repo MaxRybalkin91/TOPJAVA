@@ -1,4 +1,4 @@
-<%@ page import="ru.javawebinar.topjava.model.User" %>
+<%@ page import="ru.javawebinar.topjava.util.TimeUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -9,15 +9,6 @@
 </head>
 <body>
 <section>
-    <form method="post">
-        Дневная норма калорий
-        <input type="number" name="dailyCalories" size=10 value="${User.getCaloriesPerDay()}">
-        <button type="submit">Сохранить</button>
-    </form>
-    <form method="get">
-        <input type="hidden" name="action" value="fill">
-        <button type="submit">Заполнить таблицу тестовыми данными</button>
-    </form>
     <form method="get">
         <button name="action" type="submit" value="add">Создать запись</button>
     </form>
@@ -31,22 +22,21 @@
         </tr>
         <c:forEach items="${meals}" var="meal">
             <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo"/>
-            <c:set var="color" value='<%=meal.isExcess() ? "red" : "green"%>'/>
             <style>
-                table {
-                    color: black;
+                .red {
+                    color: red
                 }
 
-                td {
-                    color: ${color};
+                .green {
+                    color: green
                 }
             </style>
-            <tr>
-                <td>${meal.getStringDateTime()}</td>
+            <tr class="${meal.excess ? 'red' : 'green'}">
+                <td>${meal.dateTime.format(TimeUtil.DATE_TIME_FORMATTER)}</td>
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
-                <td><a href="meals?id=${meal.getId()}&action=edit">Ред.</a></td>
-                <td><a href="meals?id=${meal.getId()}&action=delete">Удалить</a></td>
+                <td><a href="meals?id=${meal.id}&action=edit">Ред.</a></td>
+                <td><a href="meals?id=${meal.id}&action=delete">Удалить</a></td>
             </tr>
         </c:forEach>
     </table>
