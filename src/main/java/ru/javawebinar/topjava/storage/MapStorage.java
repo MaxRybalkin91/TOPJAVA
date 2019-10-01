@@ -39,7 +39,8 @@ public class MapStorage implements Storage {
         return mealMapStorage.values();
     }
 
-    public void fillMapStorage() {
+    @Override
+    public void fillStorage() {
         List<Meal> meals = Arrays.asList(
                 new Meal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500),
                 new Meal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000),

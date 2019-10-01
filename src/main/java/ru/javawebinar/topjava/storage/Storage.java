@@ -13,4 +13,6 @@ public interface Storage {
     Meal get(Integer id);
 
     Collection<Meal> getAll();
+
+    void fillStorage();
 }

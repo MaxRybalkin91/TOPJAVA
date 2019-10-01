@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.storage.MapStorage;
+import ru.javawebinar.topjava.storage.Storage;
 import ru.javawebinar.topjava.util.MealsUtil;
 
 import javax.servlet.ServletException;
@@ -17,11 +18,11 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    private MapStorage storage = new MapStorage();
+    private Storage storage = new MapStorage();
 
     @Override
     public void init() {
-        storage.fillMapStorage();
+        storage.fillStorage();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -45,7 +46,6 @@ public class MealServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         log.debug("redirect to meals");
-        String page = "meals.jsp";
         String action = request.getParameter("action");
 
         if (!isEmpty(action)) {
@@ -60,14 +60,14 @@ public class MealServlet extends HttpServlet {
                     log.info(action.equals("add") ? "adding" : "editing");
                     Meal meal = action.equals("add") ? new Meal(LocalDateTime.now(), "", 0) : storage.get(getId(request));
                     request.setAttribute("meal", meal);
-                    page = "edit.jsp";
-                    break;
+                    request.getRequestDispatcher("/jsp/meal/edit.jsp").forward(request, response);
+                    return;
                 default:
                     break;
             }
         }
         request.setAttribute("meals", MealsUtil.convertWithExcess(storage.getAll(), LocalTime.MIN, LocalTime.MAX));
-        request.getRequestDispatcher(page).forward(request, response);
+        request.getRequestDispatcher("/jsp/meal/meals.jsp").forward(request, response);
     }
 
     private boolean isEmpty(String value) {
