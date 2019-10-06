@@ -4,10 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
+import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.DateTimeUtil;
+import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
@@ -22,27 +26,30 @@ public class MealServiceImpl implements MealService {
     }
 
     @Override
-    public Meal create(Meal meal) {
-        return repository.save(meal);
+    public Meal create(int userId, Meal meal) {
+        return repository.save(userId, meal);
     }
 
     @Override
-    public boolean delete(Integer mealId) throws NotFoundException {
-        return checkNotFoundWithId(repository.delete(mealId), mealId);
+    public boolean delete(int userId, int mealId) throws NotFoundException {
+        return checkNotFoundWithId(repository.delete(userId, mealId), mealId);
     }
 
     @Override
-    public Meal get(Integer mealId) throws NotFoundException {
-        return checkNotFoundWithId(repository.get(mealId), mealId);
+    public Meal get(int userId, int mealId) throws NotFoundException {
+        return checkNotFoundWithId(repository.get(userId, mealId), mealId);
     }
 
     @Override
-    public Collection<Meal> getAll() {
-        return repository.getAll();
+    public Collection<MealTo> getAll(int userId, int caloriesPerDay) {
+        return MealsUtil.getWithExcess(repository.getAll(userId), caloriesPerDay);
     }
 
     @Override
-    public Collection<Meal> getAllFiltered(LocalDateTime start, LocalDateTime end) throws NotFoundException {
-        return repository.getAllFiltered(start, end);
+    public Collection<MealTo> getAllFiltered(int userId, LocalDateTime start, LocalDateTime end, int caloriesPerDay) throws NotFoundException {
+        return MealsUtil.getWithExcess(repository.getAllFiltered(userId, start, end), caloriesPerDay)
+                .stream()
+                .filter(meal -> DateTimeUtil.isBetween(meal.getDateTime().toLocalTime(), start.toLocalTime(), end.toLocalTime()))
+                .collect(Collectors.toList());
     }
 }

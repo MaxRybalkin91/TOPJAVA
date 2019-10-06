@@ -18,7 +18,7 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepositoryImpl.class);
     private Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger(0);
-    private static final Comparator<User> USER_COMPARATOR = Comparator.comparing(User::getName);
+    private final Comparator<User> USER_COMPARATOR = Comparator.comparing(User::getName).thenComparing(User::getEmail);
 
     @Override
     public boolean delete(int id) {
@@ -40,7 +40,7 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     @Override
     public User get(int id) {
         log.info("get {}", id);
-        return null;
+        return userMap.get(id);
     }
 
     @Override
@@ -54,12 +54,10 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     @Override
     public User getByEmail(String email) {
         log.info("getByEmail {}", email);
-        for (Map.Entry<Integer, User> entry : userMap.entrySet()) {
-            User user = entry.getValue();
-            if (user.getEmail().equals(email)) {
-                return user;
-            }
-        }
-        return null;
+        return userMap.values()
+                .stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst()
+                .orElse(null);
     }
 }

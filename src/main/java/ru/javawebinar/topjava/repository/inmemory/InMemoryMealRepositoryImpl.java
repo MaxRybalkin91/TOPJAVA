@@ -1,75 +1,78 @@
 package ru.javawebinar.topjava.repository.inmemory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.DateTimeUtil;
+import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepositoryImpl implements MealRepository {
-    private Map<Integer, List<Meal>> repository = new ConcurrentHashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(InMemoryMealRepositoryImpl.class);
+    private Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger(0);
-    private static final int TEST_USER_ID = authUserId();
+    private final Comparator<Meal> MEAL_COMPARATOR = Comparator.comparing(Meal::getDateTime).reversed();
+    private List emptyList = Collections.EMPTY_LIST;
+
+    {
+        MealsUtil.MEALS.forEach(meal -> save(1, meal));
+        MealsUtil.MEALS.forEach(meal -> save(2, meal));
+    }
 
     @Override
-    public Meal save(Meal meal) {
+    public Meal save(int userId, Meal meal) {
         if (meal.isNew()) {
-            Integer id = counter.getAndIncrement();
+            int id = counter.getAndIncrement();
             meal.setId(id);
         }
-        setRepository(meal);
+        Map<Integer, Meal> mealMap = new HashMap<>();
+        mealMap.put(meal.getId(), meal);
+        repository.merge(userId, mealMap, (map1, map2) -> {
+            map1.putAll(map2);
+            return map1;
+        });
         return meal;
     }
 
     @Override
-    public boolean delete(int id) {
-        return repository.remove(id) != null;
+    public boolean delete(int userId, int mealId) {
+        log.info("delete meal_id {} of user_id {}", mealId, userId);
+        return repository.get(userId).remove(mealId) != null;
     }
 
     @Override
-    public Meal get(int id) {
-        List<Meal> mealList = getAll();
-        for (Meal meal : mealList) {
-            if (meal.getId() == id) {
-                return meal;
-            }
+    public Meal get(int userId, int mealId) {
+        log.info("get meal_id {} of user_id {}", mealId, userId);
+        return repository.get(userId).get(mealId);
+    }
+
+    @Override
+    public List<Meal> getAll(int userId) {
+        log.info("get all of user_id {}", userId);
+        Map<Integer, Meal> mealMap = repository.get(userId);
+        if (mealMap == null) {
+            return emptyList;
         }
-        return null;
+        return getFiltered(mealMap.values(), meal -> true);
     }
 
     @Override
-    public List<Meal> getAll() {
-        return repository.get(TEST_USER_ID);
+    public List<Meal> getAllFiltered(int userId, LocalDateTime start, LocalDateTime end) {
+        log.info("get all filtered of user_id {} between dateTimes {} and {}", userId, start, end);
+        return getFiltered(getAll(userId), meal -> DateTimeUtil.isBetween(meal.getDateTime().toLocalDate(), start.toLocalDate(), end.toLocalDate()));
     }
 
-    @Override
-    public Collection<Meal> getAllFiltered(LocalDateTime start, LocalDateTime end) {
-        List<Meal> mealList = new ArrayList<>();
-        for (Meal meal : getAll()) {
-            if (DateTimeUtil.isBetween(meal.getDateTime(), start, end)) {
-                mealList.add(meal);
-            }
-        }
-        return mealList;
+    private List<Meal> getFiltered(Collection<Meal> mealList, Predicate<Meal> filter) {
+        return mealList.stream().filter(filter).sorted(MEAL_COMPARATOR).collect(Collectors.toList());
     }
 
-    private void setRepository(Meal meal) {
-        List<Meal> mealList = new ArrayList<>();
-        mealList.add(meal);
-        repository.merge(TEST_USER_ID, mealList, (list1, list2) -> {
-            list1.addAll(list2);
-            return list1;
-        });
-    }
 }
-
