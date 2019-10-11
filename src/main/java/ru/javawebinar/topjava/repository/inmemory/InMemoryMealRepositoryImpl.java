@@ -21,38 +21,33 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     private Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private AtomicInteger counter = new AtomicInteger(0);
     private final Comparator<Meal> MEAL_COMPARATOR = Comparator.comparing(Meal::getDateTime).reversed();
-    private List emptyList = Collections.EMPTY_LIST;
 
     {
-        MealsUtil.MEALS.forEach(meal -> save(1, meal));
-        MealsUtil.MEALS.forEach(meal -> save(2, meal));
+        MealsUtil.MEALS_1.forEach(meal -> save(1, meal));
+        MealsUtil.MEALS_2.forEach(meal -> save(2, meal));
     }
 
     @Override
     public Meal save(int userId, Meal meal) {
+        Map<Integer, Meal> meals = repository.computeIfAbsent(userId, ConcurrentHashMap::new);
         if (meal.isNew()) {
-            int id = counter.getAndIncrement();
-            meal.setId(id);
+            meal.setId(counter.getAndIncrement());
+            meals.put(meal.getId(), meal);
+            return meal;
         }
-        Map<Integer, Meal> mealMap = new HashMap<>();
-        mealMap.put(meal.getId(), meal);
-        repository.merge(userId, mealMap, (map1, map2) -> {
-            map1.putAll(map2);
-            return map1;
-        });
-        return meal;
+        return meals.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
     }
 
     @Override
     public boolean delete(int userId, int mealId) {
-        log.info("delete meal_id {} of user_id {}", mealId, userId);
-        return repository.get(userId).remove(mealId) != null;
+        Map<Integer, Meal> meals = repository.get(userId);
+        return meals != null && meals.remove(mealId) != null;
     }
 
     @Override
     public Meal get(int userId, int mealId) {
-        log.info("get meal_id {} of user_id {}", mealId, userId);
-        return repository.get(userId).get(mealId);
+        Map<Integer, Meal> meals = repository.get(userId);
+        return meals == null ? null : meals.get(mealId);
     }
 
     @Override
@@ -60,7 +55,7 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
         log.info("get all of user_id {}", userId);
         Map<Integer, Meal> mealMap = repository.get(userId);
         if (mealMap == null) {
-            return emptyList;
+            return Collections.EMPTY_LIST;
         }
         return getFiltered(mealMap.values(), meal -> true);
     }

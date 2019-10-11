@@ -18,4 +18,6 @@ public interface MealService {
     Collection<MealTo> getAll(int userId, int caloriesPerDay);
 
     Collection<MealTo> getAllFiltered(int userId, LocalDateTime start, LocalDateTime end, int caloriesPerDay) throws NotFoundException;
+
+    void update(int userId, Meal meal) throws NotFoundException;
 }

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import javax.servlet.ServletConfig;
@@ -14,9 +13,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Objects;
 
 public class MealServlet extends HttpServlet {
@@ -74,14 +74,15 @@ public class MealServlet extends HttpServlet {
                     log.info(action.equals("all") ? "getAllFiltered" : "getAll");
                     if (action.equals("allFiltered")) {
                         String startDate = request.getParameter("startDate");
-                        String endDate = request.getParameter("endDate");
                         String startTime = request.getParameter("startTime");
+                        String endDate = request.getParameter("endDate");
                         String endTime = request.getParameter("endTime");
-                        List<LocalDateTime> dateTimeList = DateTimeUtil.getParsed(startDate, startTime, endDate, endTime);
 
-                        LocalDateTime start = dateTimeList.get(0);
-                        LocalDateTime end = dateTimeList.get(1);
-                        meals = mealRestController.getAllFiltered(start, end);
+                        LocalDate firstDate = isEmpty(startDate) ? null : LocalDate.parse(startDate);
+                        LocalTime firstTime = isEmpty(startTime) ? null : LocalTime.parse(startTime);
+                        LocalDate secondDate = isEmpty(endDate) ? null : LocalDate.parse(endDate);
+                        LocalTime secondTime = isEmpty(endTime) ? null : LocalTime.parse(endTime);
+                        meals = mealRestController.getAllFiltered(firstDate, firstTime, secondDate, secondTime);
                     }
                 }
                 request.setAttribute("meals", meals);
@@ -92,5 +93,9 @@ public class MealServlet extends HttpServlet {
     private int getId(HttpServletRequest request) {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
         return Integer.parseInt(paramId);
+    }
+
+    private boolean isEmpty(String value) {
+        return value == null || value.trim().length() == 0;
     }
 }

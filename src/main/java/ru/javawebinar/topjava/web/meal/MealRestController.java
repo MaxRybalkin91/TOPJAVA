@@ -7,8 +7,13 @@ import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.SecurityUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
+
+import static java.util.Objects.isNull;
+import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 
 @Controller
 public class MealRestController {
@@ -17,30 +22,34 @@ public class MealRestController {
     private MealService service;
 
     public Collection<MealTo> getAll() {
-        return service.getAll(getUserId(), getUserCalories());
+        return service.getAll(SecurityUtil.getAuthUserId(), SecurityUtil.getAuthUserCaloriesPerDay());
     }
 
     public Meal create(Meal meal) {
-        return service.create(getUserId(), meal);
+        return service.create(SecurityUtil.getAuthUserId(), meal);
     }
 
     public boolean delete(int mealId) {
-        return service.delete(getUserId(), mealId);
+        return service.delete(SecurityUtil.getAuthUserId(), mealId);
     }
 
     public Meal get(int mealId) {
-        return service.get(getUserId(), mealId);
+        return service.get(SecurityUtil.getAuthUserId(), mealId);
     }
 
-    public Collection<MealTo> getAllFiltered(LocalDateTime start, LocalDateTime end) {
-        return service.getAllFiltered(getUserId(), start, end, getUserCalories());
+    public Collection<MealTo> getAllFiltered(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
+        LocalDate firstDate = isNull(startDate) ? LocalDate.MIN : startDate;
+        LocalTime firstTime = isNull(startTime) ? LocalTime.MIN : startTime;
+        LocalDate secondDate = isNull(endDate) ? LocalDate.MAX : endDate;
+        LocalTime secondTime = isNull(endTime) ? LocalTime.MAX : endTime;
+
+        LocalDateTime start = LocalDateTime.of(firstDate, firstTime);
+        LocalDateTime end = LocalDateTime.of(secondDate, secondTime);
+        return service.getAllFiltered(SecurityUtil.getAuthUserId(), start, end, SecurityUtil.getAuthUserCaloriesPerDay());
     }
 
-    private int getUserId() {
-        return SecurityUtil.getAuthUserId();
-    }
-
-    private int getUserCalories() {
-        return SecurityUtil.getAuthUserCaloriesPerDay();
+    public void update(int userId, Meal meal) {
+        assureIdConsistent(meal, userId);
+        service.update(userId, meal);
     }
 }

@@ -5,13 +5,11 @@ import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
@@ -47,9 +45,11 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public Collection<MealTo> getAllFiltered(int userId, LocalDateTime start, LocalDateTime end, int caloriesPerDay) throws NotFoundException {
-        return MealsUtil.getWithExcess(repository.getAllFiltered(userId, start, end), caloriesPerDay)
-                .stream()
-                .filter(meal -> DateTimeUtil.isBetween(meal.getDateTime().toLocalTime(), start.toLocalTime(), end.toLocalTime()))
-                .collect(Collectors.toList());
+        return MealsUtil.getFilteredWithExcess(repository.getAllFiltered(userId, start, end), caloriesPerDay, start.toLocalTime(), end.toLocalTime());
+    }
+
+    @Override
+    public void update(int userId, Meal meal) throws NotFoundException {
+        checkNotFoundWithId(repository.save(userId, meal), meal.getId());
     }
 }
