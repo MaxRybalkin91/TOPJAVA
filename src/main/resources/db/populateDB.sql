@@ -15,7 +15,15 @@ VALUES ('ROLE_USER', 100000),
        ('ROLE_ADMIN', 100001);
 
 INSERT INTO meals (id, user_id, date_time, description, calories)
-VALUES (100000, 100000, '2015-05-30 10:00:00', 'breakfast-user', 1000),
-       (99990, 100000, '2015-05-30 13:00:00', 'lunch-user', 1000),
-       (99980, 100001, '2015-05-30 10:00:00', 'breakfast-admin', 1000),
-       (99970, 100001, '2015-05-30 13:00:00', 'lunch-admin', 1000)
+VALUES (nextval('global_seq'), 100000, '2015-05-30 10:00:00', 'breakfast-user_1', 1000),
+       (nextval('global_seq'), 100000, '2015-05-30 13:00:00', 'lunch-user_1', 1000),
+       (nextval('global_seq'), 100000, '2015-05-30 19:00:00', 'dinner-user_1', 1000),
+       (nextval('global_seq'), 100000, '2015-05-31 10:00:00', 'breakfast-user_2', 1000),
+       (nextval('global_seq'), 100000, '2015-05-31 13:00:00', 'lunch-user_2', 1000),
+       (nextval('global_seq'), 100000, '2015-05-31 19:00:00', 'dinner-user_2', 1000),
+       (nextval('global_seq'), 100001, '2015-05-30 10:00:00', 'breakfast-admin_1', 1000),
+       (nextval('global_seq'), 100001, '2015-05-30 13:00:00', 'lunch-admin_1', 1000),
+       (nextval('global_seq'), 100001, '2015-05-30 19:00:00', 'dinner-admin_1', 1000),
+       (nextval('global_seq'), 100001, '2015-05-31 10:00:00', 'breakfast-admin_2', 1000),
+       (nextval('global_seq'), 100001, '2015-05-31 13:00:00', 'lunch-admin_2', 1000),
+       (nextval('global_seq'), 100001, '2015-05-31 19:00:00', 'dinner-admin_2', 1000)
