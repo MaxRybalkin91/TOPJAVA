@@ -1,7 +1,13 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -12,9 +18,11 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.UserTestData.*;
 
@@ -26,8 +34,36 @@ import static ru.javawebinar.topjava.UserTestData.*;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class UserServiceTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(UserServiceTest.class);
+
+    private static List<String> testList = new ArrayList<>();
+
     @Autowired
     private UserService service;
+
+    @Rule
+    public final Stopwatch stopwatch = new Stopwatch() {
+        String message;
+
+        protected void succeeded(long nanos, Description description) {
+            message = description.getMethodName() + " succeeded, it took time " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
+            LOG.info(message);
+            testList.add(message);
+        }
+
+        protected void failed(long nanos, Description description) {
+            message = description.getMethodName() + " failed, it took time " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
+            LOG.info(message);
+            testList.add(message);
+        }
+    };
+
+    @AfterClass
+    public static void printTestsTime() {
+        for (String s : testList) {
+            System.out.println(s);
+        }
+    }
 
     @Test
     public void create() throws Exception {

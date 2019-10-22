@@ -1,7 +1,13 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -12,6 +18,9 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -25,8 +34,36 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(MealServiceTest.class);
+
     @Autowired
     private MealService service;
+
+    private static List<String> testList = new ArrayList<>();
+
+    @Rule
+    public final Stopwatch stopwatch = new Stopwatch() {
+        String message;
+
+        protected void succeeded(long nanos, Description description) {
+            message = description.getMethodName() + " succeeded, it took time " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
+            LOG.info(message);
+            testList.add(message);
+        }
+
+        protected void failed(long nanos, Description description) {
+            message = description.getMethodName() + " failed, it took time " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
+            LOG.info(message);
+            testList.add(message);
+        }
+    };
+
+    @AfterClass
+    public static void printTestsTime() {
+        for (String s : testList) {
+            System.out.println(s);
+        }
+    }
 
     @Test
     public void delete() throws Exception {
