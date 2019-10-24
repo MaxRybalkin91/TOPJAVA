@@ -47,26 +47,16 @@ public class MealServiceTest {
 
     @Rule
     public final Stopwatch stopwatch = new Stopwatch() {
-        String message;
-
-        protected void succeeded(long nanos, Description description) {
-            message = description.getMethodName() + " succeeded, it took time " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
+        protected void finished(long nanos, Description description) {
+            String message = description.getMethodName() + " finished, it took " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
             LOG.info(message);
-            testList.add(message);
-        }
-
-        protected void failed(long nanos, Description description) {
-            message = description.getMethodName() + " failed, it took time " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
-            LOG.info(message);
-            testList.add(message);
+            testList.add("\n" + message);
         }
     };
 
     @AfterClass
     public static void printTestsTime() {
-        for (String s : testList) {
-            System.out.println(s);
-        }
+        LOG.info(testList.toString());
     }
 
     @Test

@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.service;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -43,26 +44,18 @@ public class UserServiceTest {
 
     @Rule
     public final Stopwatch stopwatch = new Stopwatch() {
-        String message;
-
-        protected void succeeded(long nanos, Description description) {
-            message = description.getMethodName() + " succeeded, it took time " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
+        protected void finished(long nanos, Description description) {
+            String message = description.getMethodName() + " finished, it took " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
             LOG.info(message);
-            testList.add(message);
-        }
-
-        protected void failed(long nanos, Description description) {
-            message = description.getMethodName() + " failed, it took time " + TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS) + " milliseconds";
-            LOG.info(message);
-            testList.add(message);
+            testList.add("\n" + message);
         }
     };
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @AfterClass
     public static void printTestsTime() {
-        for (String s : testList) {
-            System.out.println(s);
-        }
+        LOG.info(testList.toString());
     }
 
     @Test
@@ -73,8 +66,9 @@ public class UserServiceTest {
         assertMatch(service.getAll(), ADMIN, newUser, USER);
     }
 
-    @Test(expected = DataAccessException.class)
+    @Test
     public void duplicateMailCreate() throws Exception {
+        thrown.expect(DataAccessException.class);
         service.create(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.ROLE_USER));
     }
 
@@ -84,8 +78,9 @@ public class UserServiceTest {
         assertMatch(service.getAll(), ADMIN);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void deletedNotFound() throws Exception {
+        thrown.expect(NotFoundException.class);
         service.delete(1);
     }
 
@@ -95,8 +90,9 @@ public class UserServiceTest {
         assertMatch(user, USER);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void getNotFound() throws Exception {
+        thrown.expect(NotFoundException.class);
         service.get(1);
     }
 
