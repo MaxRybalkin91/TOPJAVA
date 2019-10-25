@@ -5,3 +5,6 @@ target
 log
 *.patch
 lib
+doc
+*.yml
+*.md
