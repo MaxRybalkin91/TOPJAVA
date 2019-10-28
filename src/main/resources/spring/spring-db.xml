@@ -19,7 +19,10 @@
         <property name="staticMethod" value="org.slf4j.bridge.SLF4JBridgeHandler.install"/>
     </bean>
 
-    <context:component-scan base-package="ru.javawebinar.**.repository.jpa"/>
+    <!--<context:component-scan base-package="ru.javawebinar.**.repository.jpa"/>-->
+
+    <context:component-scan base-package="ru.javawebinar.**.repository.datajpa"/>
+    <jpa:repositories base-package="ru.javawebinar.**.repository.datajpa"/>
 
     <jdbc:initialize-database data-source="dataSource" enabled="${database.init}">
         <jdbc:script location="classpath:db/${jdbc.initLocation}"/>
@@ -94,5 +97,12 @@
               p:url="${database.url}"
               p:username="${database.username}"
               p:password="${database.password}"/>
+    </beans>
+
+    <beans profile="jdbc">
+    </beans>
+    <beans profile="jpa">
+    </beans>
+    <beans profile="datajpa">
     </beans>
 </beans>
