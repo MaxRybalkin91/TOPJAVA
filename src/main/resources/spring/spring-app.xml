@@ -5,12 +5,13 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <!--
-        <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepositoryImpl" id="inmemoryUserRepository"/>
+        <bean class="ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepository"/>
 
-        <bean class="ru.javawebinar.topjava.service.UserServiceImpl">
-            <property name="repository" ref="inmemoryUserRepository"/>
+        <bean class="ru.javawebinar.topjava.service.UserService">
+            <constructor-arg name="repository" ref="inMemoryUserRepository"/>
         </bean>
     -->
+    <import resource="spring-tools.xml"/>
 
     <!-- Not necessary, already included with component-scan -->
     <!--<context:annotation-config/>-->
