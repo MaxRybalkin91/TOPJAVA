@@ -11,8 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
-import org.springframework.test.context.junit4.SpringRunner;
-import ru.javawebinar.topjava.ActiveDbProfileResolver;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import ru.javawebinar.topjava.Profiles;
 
 import java.util.concurrent.TimeUnit;
 
@@ -22,15 +22,15 @@ import static org.slf4j.LoggerFactory.getLogger;
         "classpath:spring/spring-app.xml",
         "classpath:spring/spring-db.xml"
 })
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-abstract public class AbstractServiceTest {
+@ActiveProfiles(Profiles.ACTIVE_DB)
+public abstract class AbstractServiceTest {
+    private static StringBuilder results = new StringBuilder();
     private static final Logger log = getLogger("result");
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    private static StringBuilder results = new StringBuilder();
 
     @Rule
     public Stopwatch stopwatch = new Stopwatch() {
