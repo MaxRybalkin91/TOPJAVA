@@ -8,7 +8,7 @@ public class Profiles {
 
     public static final String REPOSITORY_IMPLEMENTATION = JPA;
 
-    private static final String
+    public static final String
             POSTGRES_DB = "postgres",
             HSQL_DB = "hsqldb";
 
