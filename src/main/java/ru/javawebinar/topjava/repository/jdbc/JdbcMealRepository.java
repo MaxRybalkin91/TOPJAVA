@@ -47,7 +47,6 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
             super(jdbcTemplate, namedParameterJdbcTemplate);
         }
 
-        @Override
         protected LocalDateTime getDateTime(LocalDateTime ldt) {
             return ldt;
         }
@@ -60,7 +59,6 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
             super(jdbcTemplate, namedParameterJdbcTemplate);
         }
 
-        @Override
         protected Timestamp getDateTime(LocalDateTime ldt) {
             return Timestamp.valueOf(ldt);
         }
@@ -72,7 +70,7 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
                 .addValue("id", meal.getId())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories())
-                .addValue("date_time", meal.getDateTime())
+                .addValue("date_time", getDateTime(meal.getDateTime()))
                 .addValue("user_id", userId);
 
         if (meal.isNew()) {
@@ -112,6 +110,6 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
         return jdbcTemplate.query(
                 "SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC",
-                ROW_MAPPER, userId, startDate, endDate);
+                ROW_MAPPER, userId, getDateTime(startDate), getDateTime(endDate));
     }
 }

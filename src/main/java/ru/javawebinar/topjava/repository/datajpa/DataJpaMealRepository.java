@@ -33,7 +33,6 @@ public class DataJpaMealRepository implements MealRepository {
         return crudMealRepository.delete(id, userId) != 0;
     }
 
-    @Transactional
     @Override
     public Meal get(int id, int userId) {
         Meal meal = crudMealRepository.findById(id).orElse(null);
