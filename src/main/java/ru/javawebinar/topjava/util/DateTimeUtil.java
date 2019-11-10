@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public class DateTimeUtil {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -40,5 +41,17 @@ public class DateTimeUtil {
 
     public static LocalTime parseLocalTime(@Nullable String str) {
         return StringUtils.isEmpty(str) ? null : LocalTime.parse(str);
+    }
+
+    public static LocalDateTime getStartInclusive(LocalDate localDate) {
+        return (localDate != null ? localDate : MIN_DATE).atStartOfDay();
+    }
+
+    public static LocalDateTime getEndExclusive(LocalDate localDate) {
+        return startOfDay(localDate != null ? localDate.plus(1, ChronoUnit.DAYS) : MAX_DATE);
+    }
+
+    private static LocalDateTime startOfDay(LocalDate localDate) {
+        return (localDate != null ? localDate.plus(1, ChronoUnit.DAYS) : MAX_DATE).atStartOfDay();
     }
 }

@@ -39,6 +39,9 @@ public class MealServiceTest {
 
     private static StringBuilder results = new StringBuilder();
 
+    @Autowired
+    private MealService service;
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -62,9 +65,6 @@ public class MealServiceTest {
                 "\n---------------------------------");
     }
 
-    @Autowired
-    private MealService service;
-
     @Test
     public void delete() throws Exception {
         service.delete(MEAL1_ID, USER_ID);
@@ -85,7 +85,7 @@ public class MealServiceTest {
 
     @Test
     public void create() throws Exception {
-        Meal newMeal = getCreated();
+        Meal newMeal = getNew();
         Meal created = service.create(newMeal, USER_ID);
         newMeal.setId(created.getId());
         assertMatch(newMeal, created);
@@ -101,7 +101,7 @@ public class MealServiceTest {
     @Test
     public void getNotFound() throws Exception {
         thrown.expect(NotFoundException.class);
-        service.get(MEAL1_ID, ADMIN_ID);
+        service.get(1, ADMIN_ID);
     }
 
     @Test
