@@ -4,12 +4,12 @@
 <%@ taglib prefix="fn" uri="http://topjava.javawebinar.ru/functions" %>
 <html>
 <head>
-    <title>Meal</title>
+    <title>Meals</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <section>
-    <h3><a href="index.html">Home</a></h3>
+    <h3><a href="index.jsp">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
     <form method="get" action="meals">

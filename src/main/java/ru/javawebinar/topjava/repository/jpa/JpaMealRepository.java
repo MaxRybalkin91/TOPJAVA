@@ -54,10 +54,11 @@ public class JpaMealRepository implements MealRepository {
     }
 
     @Override
-    public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
+    public List<Meal> getBetweenInclusive(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
         return em.createNamedQuery(Meal.GET_BETWEEN, Meal.class)
                 .setParameter("userId", userId)
-                .setParameter("startDate", startDate)
-                .setParameter("endDate", endDate).getResultList();
+                .setParameter("startDate", startDateTime)
+                .setParameter("endDate", endDateTime)
+                .getResultList();
     }
 }
