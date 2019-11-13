@@ -1,30 +1,51 @@
-package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web.meal;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.web.meal.MealRestController;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 
-import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
-import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
+@Controller
+public class JspMealController extends AbstractMealController {
 
-public class MealServlet extends HttpServlet {
+    @GetMapping("/meals")
+    public String getMeals(Model model, HttpServletRequest request) {
+        model.addAttribute("meals", getAll());
+        return "meals";
+    }
 
-    private MealRestController mealController;
+    @GetMapping("/meals")
+    public String getMeal(HttpServletRequest request) {
+        final Meal meal = "create".equals(request.getParameter("action")) ?
+                new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
+                get(getId(request));
+        request.setAttribute("meal", meal);
+        return "mealForm";
+    }
 
+    @PostMapping("/mealForm")
+    public String setMeal(HttpServletRequest request) {
+        Meal meal = new Meal(
+                LocalDateTime.parse(request.getParameter("dateTime")),
+                request.getParameter("description"),
+                Integer.parseInt(request.getParameter("calories")));
+
+        if (StringUtils.isEmpty(request.getParameter("id"))) {
+            create(meal);
+        } else {
+            update(meal, getId(request));
+        }
+        return "meals";
+    }
+
+
+    /*
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -86,4 +107,5 @@ public class MealServlet extends HttpServlet {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
         return Integer.parseInt(paramId);
     }
+     */
 }
