@@ -33,13 +33,13 @@ public class MealRestController extends AbstractMealController {
     }
 
     @Override
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public List<MealTo> getAll() {
         return super.getAll();
     }
 
     @Override
-    @GetMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/filter")
     public List<MealTo> getBetween(
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                     LocalDate startDate,
@@ -53,15 +53,15 @@ public class MealRestController extends AbstractMealController {
     }
 
     @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void update(@RequestBody Meal meal, @PathVariable int id) {
         super.update(meal, id);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Meal> createNewMeal() {
-        Meal created = super.create(NEW_MEAL);
+    @PostMapping
+    public ResponseEntity<Meal> createNewMeal(@RequestBody Meal meal) {
+        Meal created = super.create(meal);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(MEALS_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();

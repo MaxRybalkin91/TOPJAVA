@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
+import static ru.javawebinar.topjava.util.MealsUtil.NEW_MEAL;
 
 @Controller
 @RequestMapping(value = "/meals")
