@@ -27,7 +27,7 @@ $(function () {
                 "order": [
                     [
                         0,
-                        "asc"
+                        "desc"
                     ]
                 ]
             })
@@ -46,8 +46,4 @@ function filter() {
 function clearFilter() {
     $("#filter")[0].reset();
     $.get(context.ajaxUrl, updateTableWithFilter);
-}
-
-function updateTableWithFilter(data) {
-    context.datatableApi.clear().rows.add(data).draw();
 }

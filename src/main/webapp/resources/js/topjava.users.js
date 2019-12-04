@@ -47,6 +47,9 @@ function setActivity(checkbox, id) {
         url: context.ajaxUrl + id + "/" + enabled,
         type: "POST"
     }).done(function () {
+        checkbox.closest("tr").attr("data-userEnabled", enabled);
         successNoty(enabled ? "Enabled" : "Disabled");
+    }).fail(function () {
+        checkbox.prop("checked", !enabled);
     })
 }
