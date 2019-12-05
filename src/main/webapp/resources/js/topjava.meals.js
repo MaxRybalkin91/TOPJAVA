@@ -40,10 +40,10 @@ function filter() {
         type: "GET",
         url: context.ajaxUrl + "filter",
         data: $("#filter").serialize()
-    }).done(updateTableWithFilter);
+    }).done(updateTableWithData);
 }
 
 function clearFilter() {
     $("#filter")[0].reset();
-    $.get(context.ajaxUrl, updateTableWithFilter);
+    updateTable();
 }

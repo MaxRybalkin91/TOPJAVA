@@ -27,16 +27,16 @@ function deleteRow(id) {
         url: context.ajaxUrl + id,
         type: "DELETE"
     }).done(function () {
-        updateTable();
+        updateTableWithData();
         successNoty("Deleted");
     });
 }
 
 function updateTable() {
-    $.get(context.ajaxUrl, updateTableWithFilter);
+    $.get(context.ajaxUrl, updateTableWithData);
 }
 
-function updateTableWithFilter(data) {
+function updateTableWithData(data) {
     context.datatableApi.clear().rows.add(data).draw();
 }
 
@@ -47,7 +47,7 @@ function save() {
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
-        updateTable();
+        updateTableWithData();
         successNoty("Saved");
     });
 }
