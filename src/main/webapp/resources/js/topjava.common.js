@@ -21,6 +21,9 @@ function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(context.ajaxUrl + id, function (data) {
         $.each(data, function (key, value) {
+            if (key === "dateTime") {
+                value = value.toString().replace('T', ' ').substring(0, 16);
+            }
             form.find("input[name='" + key + "']").val(value);
         });
         $('#editRow').modal();
@@ -94,3 +97,6 @@ function renderDeleteBtn(data, type, row) {
         return "<a onclick='deleteRow(" + row.id + ");'><span class='fa fa-remove'></span></a>";
     }
 }
+
+
+

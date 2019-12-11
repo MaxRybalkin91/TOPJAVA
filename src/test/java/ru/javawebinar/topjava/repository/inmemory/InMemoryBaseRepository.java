@@ -16,7 +16,7 @@ public class InMemoryBaseRepository<T extends AbstractBaseEntity> {
 
     private static AtomicInteger counter = new AtomicInteger(START_SEQ);
 
-    Map<Integer, T> map = new ConcurrentHashMap<>();
+    public Map<Integer, T> map = new ConcurrentHashMap<>();
 
     public T save(T entry) {
         Objects.requireNonNull(entry, "Entry must not be null");
@@ -36,7 +36,7 @@ public class InMemoryBaseRepository<T extends AbstractBaseEntity> {
         return map.get(id);
     }
 
-    Collection<T> getCollection() {
+    public Collection<T> getCollection() {
         return map.values();
     }
 }
