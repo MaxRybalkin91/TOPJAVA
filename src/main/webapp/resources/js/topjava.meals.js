@@ -68,7 +68,7 @@ $(function () {
                 ]
             ],
             "createdRow": function (row, data, dataIndex) {
-                $(row).attr("data-mealExcess", !!data.excess);
+                $(row).attr("data-mealExcess", data.excess);
             }
         }),
         updateTable: function () {
