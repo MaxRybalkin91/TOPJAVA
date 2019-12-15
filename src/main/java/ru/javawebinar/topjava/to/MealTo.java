@@ -1,21 +1,34 @@
 package ru.javawebinar.topjava.to;
 
+import org.hibernate.validator.constraints.Range;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.beans.ConstructorProperties;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class MealTo extends BaseTo {
+public class MealTo extends BaseTo implements Serializable {
 
+    @NotNull(message = "DateTime must not be null")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private final LocalDateTime dateTime;
 
+    @NotBlank(message = "Description must not be null")
+    @Size(min = 2, max = 120, message = "Description has length > 1 and < 121 symbol(s)")
     private final String description;
 
-    private final int calories;
+    @NotNull(message = "Calories must not be null")
+    @Range(min = 10, max = 5000, message = "Calories must be > 10 and < 5000")
+    private final Integer calories;
 
-    private final boolean excess;
+    private final Boolean excess;
 
     @ConstructorProperties({"id", "dateTime", "description", "calories", "excess"})
-    public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
+    public MealTo(Integer id, LocalDateTime dateTime, String description, Integer calories, Boolean excess) {
         super(id);
         this.dateTime = dateTime;
         this.description = description;
@@ -43,17 +56,16 @@ public class MealTo extends BaseTo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MealTo that = (MealTo) o;
-        return calories == that.calories &&
-                excess == that.excess &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(dateTime, that.dateTime) &&
-                Objects.equals(description, that.description);
+        MealTo mealTo = (MealTo) o;
+        return dateTime.equals(mealTo.dateTime) &&
+                description.equals(mealTo.description) &&
+                calories.equals(mealTo.calories) &&
+                Objects.equals(excess, mealTo.excess);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, dateTime, description, calories, excess);
+        return Objects.hash(dateTime, description, calories, excess);
     }
 
     @Override

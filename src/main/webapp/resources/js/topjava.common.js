@@ -21,10 +21,11 @@ function updateRow(id) {
     $("#modalTitle").html(i18n["editTitle"]);
     $.get(context.ajaxUrl + id, function (data) {
         $.each(data, function (key, value) {
-            if (key === "dateTime") {
-                value = value.toString().replace('T', ' ').substring(0, 16);
+            if (key == "dateTime") {
+                form.find("input[name='" + key + "']").val(value.replace("T", " "));
+            } else {
+                form.find("input[name='" + key + "']").val(value);
             }
-            form.find("input[name='" + key + "']").val(value);
         });
         $('#editRow').modal();
     });
@@ -47,10 +48,18 @@ function updateTableByData(data) {
 }
 
 function save() {
+    dataForm = form.serializeArray();
+    for (item in dataForm) {
+        if (dataForm[item].name == "dateTime") {
+            dataForm[item].value = dataForm[item].value.replace(" ", "T");
+        }
+    }
+
     $.ajax({
         type: "POST",
         url: context.ajaxUrl,
-        data: form.serialize()
+        // data: form.serialize()
+        data: dataForm
     }).done(function () {
         $("#editRow").modal("hide");
         context.updateTable();
@@ -97,6 +106,3 @@ function renderDeleteBtn(data, type, row) {
         return "<a onclick='deleteRow(" + row.id + ");'><span class='fa fa-remove'></span></a>";
     }
 }
-
-
-

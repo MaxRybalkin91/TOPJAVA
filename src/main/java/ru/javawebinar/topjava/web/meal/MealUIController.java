@@ -7,13 +7,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.Util;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-
-import static ru.javawebinar.topjava.util.Util.getStringBinding;
 
 @RestController
 @RequestMapping("/ajax/profile/meals")
@@ -27,7 +26,7 @@ public class MealUIController extends AbstractMealController {
 
     @Override
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Meal get(@PathVariable int id) {
+    public Meal get(@PathVariable("id") int id) {
         return super.get(id);
     }
 
@@ -41,12 +40,13 @@ public class MealUIController extends AbstractMealController {
     @PostMapping
     public ResponseEntity<String> createOrUpdate(@Valid Meal meal, BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.unprocessableEntity().body(getStringBinding(result));
+            return Util.getResponseEntity(result);
         }
+
         if (meal.isNew()) {
             super.create(meal);
         } else {
-            super.update(meal, meal.id());
+            super.update(meal, meal.getId());
         }
         return ResponseEntity.ok().build();
     }

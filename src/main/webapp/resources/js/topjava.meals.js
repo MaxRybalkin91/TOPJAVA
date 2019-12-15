@@ -14,20 +14,6 @@ function clearFilter() {
 }
 
 $(function () {
-    $("#startDate, #endDate").datetimepicker({
-        timepicker: false,
-        format: 'Y-m-d'
-    });
-    $("#startTime, #endTime").datetimepicker({
-        datepicker: false,
-        format: 'H:i'
-    });
-    $("#dateTime").datetimepicker({
-        format: 'Y-m-d H:i'
-    });
-});
-
-$(function () {
     makeEditable({
         ajaxUrl: mealAjaxUrl,
         datatableApi: $("#datatable").DataTable({
@@ -40,8 +26,8 @@ $(function () {
             "columns": [
                 {
                     "data": "dateTime",
-                    "render": function (date, type, row) {
-                        return date.replace('T', ' ').substring(0, 16);
+                    "render": function (data, type, row) {
+                        return moment(data).format("YYYY-MM-DD HH:mm");
                     }
                 },
                 {
@@ -51,13 +37,13 @@ $(function () {
                     "data": "calories"
                 },
                 {
-                    "defaultContent": "Edit",
                     "orderable": false,
+                    "defaultContent": "",
                     "render": renderEditBtn
                 },
                 {
-                    "defaultContent": "Delete",
                     "orderable": false,
+                    "defaultContent": "",
                     "render": renderDeleteBtn
                 }
             ],
@@ -70,9 +56,25 @@ $(function () {
             "createdRow": function (row, data, dataIndex) {
                 $(row).attr("data-mealExcess", data.excess);
             }
+
         }),
-        updateTable: function () {
-            $.get(mealAjaxUrl, updateFilteredTable);
-        }
+        updateTable: updateFilteredTable
     });
+});
+
+$('#dateTime').datetimepicker(
+    {
+        // format: 'Y-m-d\\TH:i',
+        format: 'Y-m-d H:i'
+    }
+);
+
+$('#startDate, #endDate').datetimepicker({
+    timepicker: false,
+    format: 'Y-m-d',
+});
+
+$('#startTime, #endTime').datetimepicker({
+    datepicker: false,
+    format: 'H:i'
 });

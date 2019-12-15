@@ -24,14 +24,6 @@ public class InMemoryMealRepository implements MealRepository {
     // Map  userId -> mealRepository
     private Map<Integer, InMemoryBaseRepository<Meal>> usersMealsMap = new ConcurrentHashMap<>();
 
-//    {
-//        MealsUtil.MEALS.forEach(meal -> save(meal, InMemoryUserRepository.USER_ID));
-//
-//        save(new Meal(LocalDateTime.of(2015, Month.JUNE, 1, 14, 0), "Админ ланч", 510), InMemoryUserRepository.ADMIN_ID);
-//        save(new Meal(LocalDateTime.of(2015, Month.JUNE, 1, 21, 0), "Админ ужин", 1500), InMemoryUserRepository.ADMIN_ID);
-//    }
-
-
     {
         var userMeals = new InMemoryBaseRepository<Meal>();
         usersMealsMap.put(UserTestData.USER_ID, userMeals);

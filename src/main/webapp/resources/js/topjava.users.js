@@ -78,7 +78,9 @@ $(function () {
                     ]
                 ],
                 "createdRow": function (row, data, dataIndex) {
-                    $(row).attr("data-userEnabled", data.enabled);
+                    if (!data.enabled) {
+                        $(row).attr("data-userEnabled", false);
+                    }
                 }
             }),
             updateTable: function () {

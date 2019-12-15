@@ -82,6 +82,6 @@
     const i18n = [];
     i18n["addTitle"] = '<spring:message code="user.add"/>';
     i18n["editTitle"] = '<spring:message code="user.edit"/>';
-    <%@include file="fragments/keysArray.jsp" %>
 </script>
+<jsp:include page="fragments/keysArray.jsp"/>
 </html>

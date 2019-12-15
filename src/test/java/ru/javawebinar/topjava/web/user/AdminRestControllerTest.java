@@ -60,7 +60,6 @@ class AdminRestControllerTest extends AbstractControllerTest {
     @Test
     void getUnAuth() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL))
-                .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
