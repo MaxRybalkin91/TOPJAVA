@@ -89,21 +89,6 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void updateUnprocessableEntity() throws Exception {
-        User updated = UserTestData.getInvalid();
-        perform(doPut(USER_ID).jsonBody(updated).basicAuth(ADMIN))
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    void createUnprocessableEntity() throws Exception {
-        User newUser = UserTestData.getInvalid();
-        perform(doPost().jsonBody(newUser).basicAuth(ADMIN))
-                .andExpect(status().isUnprocessableEntity());
-
-    }
-
-    @Test
     void createWithLocation() throws Exception {
         User newUser = UserTestData.getNew();
         ResultActions action = perform(doPost().jsonUserWithPassword(newUser).basicAuth(ADMIN))
@@ -133,5 +118,32 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         assertFalse(userService.get(USER_ID).isEnabled());
+    }
+
+    @Test
+    void createUnprocessableEntity() throws Exception {
+        perform(doPost().jsonBody(UserTestData.getInvalid()).basicAuth(ADMIN))
+                .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    void updateUnprocessableEntity() throws Exception {
+        perform(doPut(USER_ID).jsonBody(UserTestData.getInvalid()).basicAuth(ADMIN))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void createWithDuplication() throws Exception {
+        perform(doPost().jsonBody(UserTestData.getDuplicated()).basicAuth(ADMIN))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void updateWithDuplication() throws Exception {
+        User updated = new User(ADMIN);
+        updated.setEmail(USER.getEmail());
+        perform(doPut(ADMIN_ID).jsonBody(updated).basicAuth(ADMIN))
+                .andExpect(status().isUnprocessableEntity());
     }
 }

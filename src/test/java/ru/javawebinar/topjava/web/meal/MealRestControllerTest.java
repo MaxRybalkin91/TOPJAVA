@@ -41,6 +41,19 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(result -> MEAL_MATCHERS.assertMatch(readFromJsonMvcResult(result, Meal.class), ADMIN_MEAL1));
     }
 
+    @Test
+    void createWithDuplication() throws Exception {
+        perform(doPost().jsonBody(MealTestData.getDuplicated()).basicAuth(USER))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void updateWithDuplication() throws Exception {
+        Meal updated = new Meal(MEAL2);
+        updated.setDateTime(MEAL1.getDateTime());
+        perform(doPut(MEAL2.getId()).jsonBody(updated).basicAuth(USER))
+                .andExpect(status().isUnprocessableEntity());
+    }
 
     @Test
     void getUnauth() throws Exception {
@@ -70,18 +83,10 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void update() throws Exception {
-        Meal updated = MealTestData.getUpdated();
-        perform(doPut(MEAL1_ID).jsonBody(updated).basicAuth(USER))
+        perform(doPut(MEAL1_ID).jsonBody(MealTestData.getUpdated()).basicAuth(USER))
                 .andExpect(status().isNoContent());
 
-        MEAL_MATCHERS.assertMatch(mealService.get(MEAL1_ID, START_SEQ), updated);
-    }
-
-    @Test
-    void updateUnprocessableEntity() throws Exception {
-        Meal updated = MealTestData.getInvalid();
-        perform(doPut(MEAL1_ID).jsonBody(updated).basicAuth(USER))
-                .andExpect(status().isUnprocessableEntity());
+        MEAL_MATCHERS.assertMatch(mealService.get(MEAL1_ID, START_SEQ), MealTestData.getUpdated());
     }
 
     @Test
@@ -94,13 +99,6 @@ class MealRestControllerTest extends AbstractControllerTest {
         newMeal.setId(newId);
         MEAL_MATCHERS.assertMatch(created, newMeal);
         MEAL_MATCHERS.assertMatch(mealService.get(newId, USER_ID), newMeal);
-    }
-
-    @Test
-    void createUnprocessableEntity() throws Exception {
-        Meal newMeal = MealTestData.getInvalid();
-        perform(doPost().jsonBody(newMeal).basicAuth(USER))
-                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -127,5 +125,17 @@ class MealRestControllerTest extends AbstractControllerTest {
         perform(doGet("filter?startDate=&endTime=").basicAuth(USER))
                 .andExpect(status().isOk())
                 .andExpect(MEAL_TO_MATCHERS.contentJson(getTos(MEALS, USER.getCaloriesPerDay())));
+    }
+
+    @Test
+    void createUnprocessableEntity() throws Exception {
+        perform(doPost().jsonBody(MealTestData.getInvalid()).basicAuth(USER))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void updateUnprocessableEntity() throws Exception {
+        perform(doPut(MEAL1_ID).jsonBody(MealTestData.getInvalid()).basicAuth(USER))
+                .andExpect(status().isUnprocessableEntity());
     }
 }

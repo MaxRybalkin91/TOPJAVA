@@ -23,6 +23,10 @@ public class UserTestData {
         return new User(null, null, null, null, 1555, false, new Date(), Collections.singleton(Role.ROLE_USER));
     }
 
+    public static User getDuplicated() {
+        return new User(null, "User", "user@yandex.ru", "password", 2005, Role.ROLE_USER);
+    }
+
     public static User getUpdated() {
         User updated = new User(USER);
         updated.setName("UpdatedName");
