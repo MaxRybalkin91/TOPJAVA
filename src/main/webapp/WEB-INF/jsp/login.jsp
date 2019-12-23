@@ -18,8 +18,7 @@
         </c:if>
         <sec:authorize access="isAnonymous()">
             <div class="pt-4">
-                <a class="btn btn-lg btn-success" href="profile/register"><spring:message code="app.register"/>
-                    &raquo;</a>
+                <a class="btn btn-lg btn-success" href="profile/register"><spring:message code="app.register"/> &raquo;</a>
                 <button type="submit" class="btn btn-lg btn-primary" onclick="login('user@yandex.ru', 'password')">
                     <spring:message code="app.login"/> User
                 </button>
@@ -73,11 +72,13 @@
         setCredentials(username, password);
         $("#login_form").submit();
     }
-
     function setCredentials(username, password) {
         $('input[name="username"]').val(username);
         $('input[name="password"]').val(password);
     }
 </script>
 </body>
+<jsp:include page="fragments/i18n.jsp">
+    <jsp:param name="page" value="user"/>
+</jsp:include>
 </html>
