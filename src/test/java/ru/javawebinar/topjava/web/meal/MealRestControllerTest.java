@@ -1,10 +1,15 @@
 package ru.javawebinar.topjava.web.meal;
 
-
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
@@ -23,17 +28,20 @@ import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 import static ru.javawebinar.topjava.util.MealsUtil.createTo;
 import static ru.javawebinar.topjava.util.MealsUtil.getTos;
 
-class MealRestControllerTest extends AbstractControllerTest {
+@SpringBootTest
+@RunWith(SpringRunner.class)
+@Transactional
+public class MealRestControllerTest extends AbstractControllerTest {
 
     @Autowired
     private MealService mealService;
 
-    MealRestControllerTest() {
+    public MealRestControllerTest() {
         super(MealRestController.REST_URL);
     }
 
     @Test
-    void get() throws Exception {
+    public void get() throws Exception {
         perform(doGet(ADMIN_MEAL_ID).basicAuth(ADMIN))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -42,47 +50,33 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void createWithDuplication() throws Exception {
-        perform(doPost().jsonBody(MealTestData.getDuplicated()).basicAuth(USER))
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    void updateWithDuplication() throws Exception {
-        Meal updated = new Meal(MEAL2);
-        updated.setDateTime(MEAL1.getDateTime());
-        perform(doPut(MEAL2.getId()).jsonBody(updated).basicAuth(USER))
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    void getUnauth() throws Exception {
+    public void getUnauth() throws Exception {
         perform(doGet(MEAL1_ID))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void getNotFound() throws Exception {
+    public void getNotFound() throws Exception {
         perform(doGet(ADMIN_MEAL_ID).basicAuth(USER))
                 .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    void delete() throws Exception {
+    public void delete() throws Exception {
         perform(doDelete(MEAL1_ID).basicAuth(USER))
                 .andExpect(status().isNoContent());
         assertThrows(NotFoundException.class, () -> mealService.get(MEAL1_ID, USER_ID));
     }
 
     @Test
-    void deleteNotFound() throws Exception {
+    public void deleteNotFound() throws Exception {
         perform(doDelete(ADMIN_MEAL_ID).basicAuth(USER))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    void update() throws Exception {
+    public void update() throws Exception {
         perform(doPut(MEAL1_ID).jsonBody(MealTestData.getUpdated()).basicAuth(USER))
                 .andExpect(status().isNoContent());
 
@@ -90,7 +84,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void createWithLocation() throws Exception {
+    public void createWithLocation() throws Exception {
         Meal newMeal = MealTestData.getNew();
         ResultActions action = perform(doPost().jsonBody(newMeal).basicAuth(USER));
 
@@ -102,7 +96,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void getAll() throws Exception {
+    public void getAll() throws Exception {
         perform(doGet().basicAuth(USER))
                 .andExpect(status().isOk())
                 .andDo(print())
@@ -111,7 +105,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void filter() throws Exception {
+    public void filter() throws Exception {
         perform(doGet("filter").basicAuth(USER).unwrap()
                 .param("startDate", "2015-05-30").param("startTime", "07:00")
                 .param("endDate", "2015-05-31").param("endTime", "11:00"))
@@ -121,21 +115,37 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void filterAll() throws Exception {
+    public void filterAll() throws Exception {
         perform(doGet("filter?startDate=&endTime=").basicAuth(USER))
                 .andExpect(status().isOk())
                 .andExpect(MEAL_TO_MATCHERS.contentJson(getTos(MEALS, USER.getCaloriesPerDay())));
     }
 
     @Test
-    void createUnprocessableEntity() throws Exception {
+    public void createUnprocessableEntity() throws Exception {
         perform(doPost().jsonBody(MealTestData.getInvalid()).basicAuth(USER))
                 .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    void updateUnprocessableEntity() throws Exception {
+    public void updateUnprocessableEntity() throws Exception {
         perform(doPut(MEAL1_ID).jsonBody(MealTestData.getInvalid()).basicAuth(USER))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test(expected = DataIntegrityViolationException.class)
+    public void createWithDuplication() throws Exception {
+        perform(doPost().jsonBody(MealTestData.getDuplicated()).basicAuth(USER));
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+    }
+
+    @Test(expected = DataIntegrityViolationException.class)
+    public void updateWithDuplication() throws Exception {
+        Meal updated = new Meal(MEAL2);
+        updated.setDateTime(MEAL1.getDateTime());
+        perform(doPut(MEAL2.getId()).jsonBody(updated).basicAuth(USER));
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
     }
 }
