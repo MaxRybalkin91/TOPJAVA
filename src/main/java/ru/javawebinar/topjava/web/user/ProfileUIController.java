@@ -1,7 +1,5 @@
 package ru.javawebinar.topjava.web.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,12 +13,11 @@ import ru.javawebinar.topjava.web.SecurityUtil;
 
 import javax.validation.Valid;
 
+import static ru.javawebinar.topjava.web.ErrorMessageUtil.USER_DUPLICATED_EMAIL;
+
 @Controller
 @RequestMapping("/profile")
 public class ProfileUIController extends AbstractUserController {
-
-    @Autowired
-    MessageSource messageSource;
 
     @GetMapping
     public String profile() {
@@ -57,7 +54,7 @@ public class ProfileUIController extends AbstractUserController {
                 status.setComplete();
                 return "redirect:/login?message=app.registered&username=" + userTo.getEmail();
             } catch (DataIntegrityViolationException e) {
-                result.rejectValue("email", "user.duplicateEmail");
+                result.rejectValue("email", USER_DUPLICATED_EMAIL);
             }
         }
         model.addAttribute("register", true);

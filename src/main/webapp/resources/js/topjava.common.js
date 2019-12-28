@@ -3,7 +3,6 @@ var context, form;
 function makeEditable(ctx) {
     context = ctx;
     context.datatableApi = $("#datatable").DataTable(
-        // https://api.jquery.com/jquery.extend/#jQuery-extend-deep-target-object1-objectN
         $.extend(true, ctx.datatableOpts,
             {
                 "ajax": {
@@ -20,7 +19,6 @@ function makeEditable(ctx) {
         failNoty(jqXHR);
     });
 
-    // solve problem with cache in IE: https://stackoverflow.com/a/4303862/548473
     $.ajaxSetup({cache: false});
 
     var token = $("meta[name='_csrf']").attr("content");
@@ -63,6 +61,7 @@ function updateTableByData(data) {
 }
 
 function save() {
+    closeNoty();
     $.ajax({
         type: "POST",
         url: context.ajaxUrl,
@@ -97,7 +96,7 @@ function failNoty(jqXHR) {
     closeNoty();
     var errorInfo = JSON.parse(jqXHR.responseText);
     failedNote = new Noty({
-        text: "<span class='fa fa-lg fa-exclamation-circle'></span> &nbsp;" + i18n["common.errorStatus"] + ":" + "<br>" + errorInfo.detail,
+        text: "<span class='fa fa-lg fa-exclamation-circle'></span> &nbsp;" + i18n["common.errorStatus"] + ": " + jqXHR.status + "<br>" + errorInfo.type + "<br>" + errorInfo.details.join("<br>"),
         type: "error",
         layout: "bottomRight"
     }).show();
